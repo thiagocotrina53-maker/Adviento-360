@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adviento 360° - Minijuego</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#172554,#312e81,#7c2d12);color:white;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.game{width:min(900px,100%);background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border-radius:25px;padding:28px;box-shadow:0 15px 45px #0006;text-align:center}
+h1{font-size:42px;margin:5px 0 8px}.subtitle{font-size:18px;margin-bottom:25px}
+.progress{height:12px;background:#ffffff33;border-radius:20px;overflow:hidden;margin:20px 0}.bar{height:100%;width:25%;background:#facc15;transition:.4s}
+.card{background:#fff;color:#172554;border-radius:20px;padding:25px;min-height:280px;display:flex;flex-direction:column;justify-content:center}
+.emoji{font-size:55px}.stage{font-size:15px;color:#64748b;font-weight:bold}.question{font-size:25px;font-weight:bold;margin:18px 0}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:bold;cursor:pointer;background:#e0e7ff;color:#172554;transition:.2s}
+button:hover{transform:translateY(-2px);background:#c7d2fe}
+button.correct{background:#86efac}.wrong{background:#fca5a5}
+#next{margin-top:20px;background:#facc15;color:#422006;display:none}
+.result{display:none}.score{font-size:35px;color:#facc15;font-weight:bold}
+@media(max-width:600px){h1{font-size:32px}.answers{grid-template-columns:1fr}.question{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="game">
+  <h1>🎄 Adviento 360°</h1>
+  <div class="subtitle">Prepara tu corazón para la llegada de Jesús</div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="card" id="card">
+    <div class="emoji" id="emoji">🕯️</div>
+    <div class="stage" id="stage">ETAPA 1 · ESPERANZA</div>
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <button id="next" onclick="nextQuestion()">Siguiente ➜</button>
+  </div>
+
+  <div class="result" id="result">
+    <h2>✨ ¡Completaste el Adviento 360°! ✨</h2>
+    <p class="score" id="score"></p>
+    <p id="message"></p>
+    <button onclick="restart()">Jugar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const questions=[
+ {e:"🕯️",s:"ETAPA 1 · ESPERANZA",q:"¿Qué representa la primera vela de Adviento?",a:["La espera confiada en la llegada de Jesús","La alegría de recibir regalos en Navidad","El recuerdo de las celebraciones navideñas anteriores","La preocupación por cumplir todas las actividades del calendario"],c:0},
+ {e:"🙏",s:"ETAPA 2 · FE",q:"¿Qué acción nos ayuda a vivir la fe en familia?",a:["Escuchar un pasaje bíblico, reflexionar y orar en familia","Memorizar oraciones sin comprender su significado","Participar solamente en las celebraciones importantes","Esperar que otras personas practiquen la fe por nosotros"],c:0},
+ {e:"😊",s:"ETAPA 3 · ALEGRÍA",q:"¿Cuál es un gesto de alegría y solidaridad?",a:["Realizar una acción solidaria sin esperar algo a cambio","Compartir únicamente cuando recibimos un beneficio","Ayudar solo a quienes pueden devolvernos el favor","Celebrar nuestra alegría sin preocuparnos por los demás"],c:0},
+ {e:"❤️",s:"ETAPA 4 · AMOR",q:"¿Cómo podemos preparar el corazón para Navidad?",a:["Viviendo con generosidad, reconciliación y disposición para ayudar","Concentrándonos principalmente en preparar los regalos y la decoración","Evitando los problemas de los demás para mantener la tranquilidad","Participando en las celebraciones sin cambiar nuestras actitudes"],c:0}
+];
+let i=0,score=0,answered=false;
+function load(){
+ answered=false;
+ const x=questions[i];
+ document.getElementById("emoji").textContent=x.e;
+ document.getElementById("stage").textContent=x.s;
+ document.getElementById("question").textContent=x.q;
+ const box=document.getElementById("answers");box.innerHTML="";
+ x.a.forEach((t,n)=>{
+   const b=document.createElement("button");b.textContent=t;
+   b.onclick=()=>answer(b,n);box.appendChild(b);
+ });
+ document.getElementById("next").style.display="none";
+ document.getElementById("bar").style.width=((i+1)/questions.length*100)+"%";
+}
+function answer(btn,n){
+ if(answered)return; answered=true;
+ const bs=[...document.querySelectorAll(".answers button")];
+ bs.forEach(b=>b.disabled=true);
+ if(n===questions[i].c){btn.classList.add("correct");score++;}else{
+   btn.classList.add("wrong");bs[questions[i].c].classList.add("correct");
+ }
+ document.getElementById("next").style.display="inline-block";
+}
+function nextQuestion(){
+ i++;
+ if(i<questions.length)load();else finish();
+}
+function finish(){
+ document.getElementById("card").style.display="none";
+ document.getElementById("result").style.display="block";
+ document.getElementById("score").textContent=score+" / "+questions.length+" respuestas correctas";
+ document.getElementById("message").textContent=score===4?"¡Excelente! Viviste las cuatro etapas del Adviento. 🎉":score>=2?"¡Muy bien! Ya estás preparado para seguir viviendo el Adviento. 😊":"¡Buen intento! Vuelve a jugar y aprende sobre el Adviento. 💪";
+}
+function restart(){
+ i=0;score=0;document.getElementById("card").style.display="flex";document.getElementById("result").style.display="none";load();
+}
+load();
+</script>
+</body>
+</html>
